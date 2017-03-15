@@ -200,8 +200,15 @@ class TSection extends TObjetStd
 		if(!empty($budget)||!empty($fk_section_parente)) {
 			$planSection = new TSectionPlanFormation();
                         $planSection->loadByCustom($PDOdb, array('fk_planform' => $_REQUEST['plan_id'], 'fk_section' => $_REQUEST['id']));
-                        $planSection->budget = $budget;
-                        $planSection->fk_section_parente =$fk_section_parente;
+                                                
+                        $deltaBudget = self::checkBudget($PDOdb, $budget, GETPOST('plan_id'), GETPOST('id'));
+                        
+                        if($deltaBudget < 0)
+                            $planSection->budget = $budget + $deltaBudget;
+                        else
+                            $planSection->budget = $budget;
+                        
+                        $planSection->fk_section_parente = $fk_section_parente;
                         $planSection->save($PDOdb);
 		}
                 
@@ -426,30 +433,43 @@ class TSection extends TObjetStd
             }
         }
         
-        public static function checkBudget(TPDOdb &$PDOdb,$planform_id,$section_id){
-            $sectionSoeurs = array();
-            self::getSectionsSoeurs($sectionSoeurs, $planform_id, $section_id);
-            $budgetSoeur = 0;
-            $pfs = new TSection();
-            $pfsParente = new TSection();
-            foreach($sectionSoeurs as $id)
-            {
-                $pfs->load($PDOdb, $id);
-                $budgetSoeur += $pfs->budget ;
-            }
-            $pfs->load($PDOdb, $section_id);
-            $pfsParente->load($PDOdb, $pfs->fk_section_parente) ;
-            $budgetParente = $pfsParente->budget;
+        public static function checkBudget(TPDOdb &$PDOdb, $newBudget, $plan_id, $section_id) {
+            $pfsLink = new TSectionPlanFormation();
+            $pfsLink->loadByCustom($PDOdb, array('fk_planform' => $plan_id, 'fk_section' => $section_id));
             
-            return $budgetSoeur <= $budgetParente;
+            $TsectionSoeurs = array(); 
+            self::getSectionsSoeurs($TsectionSoeurs, $plan_id, $section_id);
+            
+            $sommeBudget = 0;
+            foreach ($TsectionSoeurs as $id) {
+                $sec = new TSectionPlanFormation();
+                $sec->loadByCustom($PDOdb, array('fk_planform' => $plan_id, 'fk_section' => $id));
+                
+                $sommeBudget += $sec->budget;
+            }
+            
+            // Récupérer le budget du plan de formation ou de la section parente
+            if($pfsLink->fk_section_parente === 0) {
+                $pf = new TPlanFormation();
+                $pf->load($PDOdb, $plan_id);
+                return $pf->budget - ($sommeBudget + $newBudget);
+            }
+            $pfsLinkParente = new TSectionPlanFormation();
+            $pfsLinkParente->loadByCustom($PDOdb, array('fk_planform' => $plan_id, 'fk_section' => $pfsLink->fk_section_parente));
+            return $pfsLinkParente->budget - ($sommeBudget + $newBudget);
+            
         }
         
+        /*
+         * Retourne toutes les sections soeurs d'une section.
+         * Ne renvoie pas la section qui a pour id, l'id passé en paramètre.
+         */
         public static function getSectionsSoeurs(&$TSectionSoeurs, $planform_id, $section_id) {
             
             $PDOdb = new TPDOdb;
             
-            $sec = new TSection();
-            $sec->load($PDOdb, $section_id);
+            $sec = new TSectionPlanFormation();
+            $sec->loadByCustom($PDOdb, array('fk_planform' => $planform_id, 'fk_section' => $section_id));
             $fkSectionParente = $sec->fk_section_parente;
             
             $sql = 'SELECT fk_section 
@@ -459,8 +479,9 @@ class TSection extends TObjetStd
             $result = $PDOdb->Execute($sql);
             if ($result !== false) {
                 while ( $PDOdb->Get_line() ) {
-                    $fkSectionSoeur=$PDOdb->Get_field('fk_section');
-                    $TSectionSoeurs[] = $fkSectionSoeur;
+                    $fkSectionSoeur = $PDOdb->Get_field('fk_section');
+                    if($fkSectionSoeur !== $section_id)
+                        $TSectionSoeurs[] = $fkSectionSoeur;
                 }
             }
         }
@@ -522,11 +543,11 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' ps.budget, ';     
 		$sql .= ' s.entity, ';
 		$sql .= ' p.rowid as planform_id, ';
-		$sql .= ' "" as poubelle ';
+		$sql .= ' "" as supprimer ';
 		$sql .= ' FROM ' . $this->get_table().' as ps';
 		$sql .= ' INNER JOIN '.$pf->get_table().' as p ON (p.rowid=ps.fk_planform)';
 		$sql .= ' INNER JOIN '.$sec->get_table().' as s ON (s.rowid=ps.fk_section)';
-                $sql .= ' INNER JOIN '.$sec->get_table().' as s2 ON (s2.rowid=ps.fk_section_parente)';
+                $sql .= ' LEFT JOIN '.$sec->get_table().' as s2 ON (s2.rowid=ps.fk_section_parente)';
 		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
 		$sql .= ' WHERE s.entity IN ('.getEntity(get_class($sec)).') AND p.entity IN ('.getEntity(get_class($pf)).')';
 
