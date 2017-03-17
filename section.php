@@ -264,7 +264,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
                 $data['budget'] = $formCore->texte('', 'budget', $planformSection->budget, 30, 255);
                 
-                $availableSection = TSection::getAvailableParentSection($PDOdb, GETPOST('plan_id', 'int'), $pfs->id);
+                $availableSection = $planformSection->getAvailableParentSection($PDOdb);
                 
                 $data['fk_section_parente'] = $formCore->combo("", 'fk_section_parente', $availableSection, $planformSection->fk_section_parente);
                 
