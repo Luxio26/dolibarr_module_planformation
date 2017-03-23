@@ -247,7 +247,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	
 	
 	
-	$btDelete = "<input type=\"button\" id=\"action-delete\" value=\"" . $langs->trans('Delete') . "\" name=\"cancel\" class=\"butActionDelete\" onclick=\"if(confirm('" . $langs->trans('PFDeleteConfirm') . "'))document.location.href='?action=delete&id=" . $pfs->rowid . "'\" />";
+	$btDelete = "<input type=\"button\" id=\"action-delete\" value=\"" . $langs->trans('Delete') . "\" name=\"cancel\" class=\"butActionDelete\" onclick=\"if(confirm('" . 'Etes vous sûr de supprimer ?'./*. $langs->trans('Etes vous sûr de supprimer ?') .*/ "'))document.location.href='?action=delete&id=" . $pfs->rowid . "'\" />";
 
 	// Fill form with title and data
 	$data = $pfs->getTrans('title');
@@ -264,7 +264,8 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
                 $data['budget'] = $formCore->texte('', 'budget', $planformSection->budget, 30, 255);
                 
-                $availableSection = $planformSection->getAvailableParentSection($PDOdb);
+                if(GETPOST('action') !== 'new')
+                    $availableSection = $planformSection->getAvailableParentSection($PDOdb);
                 
                 $data['fk_section_parente'] = $formCore->combo("", 'fk_section_parente', $availableSection, $planformSection->fk_section_parente);
                 

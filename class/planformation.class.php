@@ -408,7 +408,7 @@ class TSectionPlanFormation extends TObjetStd
             $pfsLink->loadByCustom($PDOdb, array('fk_planform' => $this->fk_planform, 'fk_section' => $this->fk_section));
             
             $TsectionSoeurs = array(); 
-            TSection::getSectionsSoeurs($TsectionSoeurs, $this->fk_planform, $this->fk_section);
+            $this->getSectionsSoeurs($TsectionSoeurs);
             
             $sommeBudget = 0;
             foreach ($TsectionSoeurs as $id) {
