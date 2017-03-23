@@ -195,6 +195,21 @@ class TSection extends TObjetStd
 		parent::start();
 
 	}
+        
+        public function isDeletable(&$PDOdb) {
+            $sql = 'SELECT rowid
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+                    WHERE fk_section='.$this->rowid;
+            $result = $PDOdb->Execute($sql);
+            if ($result !== false) {
+		return !$PDOdb->Get_line();
+                /*while ( $PDOdb->Get_line() ) {
+			return false;
+		}
+                return true;*/
+            }
+            
+        }
 	
 	function save(&$PDOdb, $budget = '', $fk_section_parente='', $plan_id=0) {
 		if(!empty($plan_id)) {
@@ -396,6 +411,17 @@ class TSectionPlanFormation extends TObjetStd
 		parent::start();
 	}
         
+        public function delete(&$PDOdb) {
+            
+            $sql = 'UPDATE '.MAIN_DB_PREFIX.'planform_planform_section
+                    SET fk_section_parente=0
+                    WHERE fk_section_parente='.$this->fk_section;
+            
+            $PDOdb->Execute($sql);
+            parent::delete($PDOdb);
+        }
+
+
         private function getSectionNameById(TPDOdb &$PDOdb, $id) {
             
             $pfs = new TSection();

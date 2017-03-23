@@ -79,7 +79,10 @@ if (! empty($action)) {
 		case 'delete' :
 
 			if ($pfs->load($PDOdb, GETPOST('id', 'int'))) {
-				$pfs->delete($PDOdb);
+                            if($pfs->isDeletable($PDOdb))
+                                $pfs->delete($PDOdb);
+                            else
+                                setEventMessage($langs->trans('NotDeletable'), 'errors');
                                 
 				_list($PDOdb, $pfs);
 			} else {
@@ -246,9 +249,6 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
             $btCancel = '<a class="butAction" href="' . dol_buildpath('/planformation/section.php?id=' . $pfs->rowid, 1) . '">' . $langs->trans('Cancel') . '</a>';
             $btModifier = '<a class="butAction" href="' . dol_buildpath('/planformation/section.php?id=' . $pfs->rowid . '&action=edit', 1) . '">' . $langs->trans('PFSectionEdit') . '</a>';
         }
-	
-	
-	
 	
 	$btDelete = "<input type=\"button\" id=\"action-delete\" value=\"" . $langs->trans('Delete') . "\" name=\"cancel\" class=\"butActionDelete\" onclick=\"if(confirm('" . 'Etes vous sûr de supprimer ?'./*. $langs->trans('PFDeleteConfirm') .*/ "'))document.location.href='?action=delete&id=" . $pfs->rowid . "'\" />";
 
