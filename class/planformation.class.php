@@ -422,7 +422,7 @@ class TSectionPlanFormation extends TObjetStd
         }
 
 
-        private function getSectionNameById(TPDOdb &$PDOdb, $id) {
+        public static function getSectionNameById(TPDOdb &$PDOdb, $id) {
             
             $pfs = new TSection();
             $pfs->load($PDOdb, $id);
@@ -482,7 +482,7 @@ class TSectionPlanFormation extends TObjetStd
             $TAvailableParentSections[0] = '';
             //return self::getSectionNameById($PDOdb, $TAvailableParentSections);
             foreach($TAvailableParentSectionsId as $id) {
-                $TAvailableParentSections[$id] = $this->getSectionNameById($PDOdb, $id);
+                $TAvailableParentSections[$id] = TSectionPlanFormation::getSectionNameById($PDOdb, $id);
             }
             
             return $TAvailableParentSections;
@@ -514,7 +514,7 @@ class TSectionPlanFormation extends TObjetStd
         public function getSectionsFilles(&$TSectionEnfantes, $fkPlanform, $fkSection) {
             
             $PDOdb = new TPDOdb;
-            $sql = 'SELECT fk_section 
+            $sql = 'SELECT fk_planform, fk_section, fk_section_parente 
                     FROM '.MAIN_DB_PREFIX.'planform_planform_section
                     WHERE fk_section_parente='.$fkSection
                     .' AND fk_planform='.$fkPlanform;
@@ -523,10 +523,38 @@ class TSectionPlanFormation extends TObjetStd
             if ($result !== false) {
                 while ( $PDOdb->Get_line() ) {
                     $fkSectionFille=$PDOdb->Get_field('fk_section');
-                    $TSectionEnfantes[] = $fkSectionFille;
+                    $TSectionEnfantes[] = array('fk_planform' => $PDOdb->Get_field('fk_planform'),
+                                                'fk_section' => $fkSectionFille,
+                                                'fk_section_parente' => $PDOdb->Get_field('fk_section_parente'));
                     $this->getSectionsFilles($TSectionEnfantes, $fkPlanform, $fkSectionFille);
                 }
             }
+        }
+        
+        /*
+         * Retourne toutes les sections d'un plan de formation ordonnées de telle façon que les sections filles
+         * apparaissent immédiatement au-dessous de leur section parente.
+         */
+        public function getAllSection(&$PDOdb, &$TRes, $fkPlanform) {
+            
+            $sql = 'SELECT fk_planform, fk_section, fk_section_parente, budget
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+                    WHERE fk_planform='.$fkPlanform
+                    .' AND fk_section_parente=0';
+            
+            $result = $PDOdb->Execute($sql);
+            if ($result !== false) {
+                while ( $PDOdb->Get_line() ) {
+                    $fkSection = $PDOdb->Get_field('fk_section');
+                    $TRes[] = array(
+                                'fk_planform' => $PDOdb->Get_field('fk_planform'),
+                                'fk_section' => $fkSection,
+                                'fk_section_parente' => $PDOdb->Get_field('fk_section_parente'));
+                    $this->getSectionsFilles($TRes, $fkPlanform, $fkSection);
+                }
+            }
+            
+            return $res;
         }
 	
 	function loadByCustom(&$db, $TParam, $annexe=false) {                
