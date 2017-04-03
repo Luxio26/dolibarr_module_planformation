@@ -434,7 +434,7 @@ class TSectionPlanFormation extends TObjetStd
             $pfsLink->loadByCustom($PDOdb, array('fk_planform' => $this->fk_planform, 'fk_section' => $this->fk_section));
             
             $TsectionSoeurs = array(); 
-            $this->getSectionsSoeurs($TsectionSoeurs);
+            $this->getSectionsSoeurs($TsectionSoeurs, $this->fk_section);
             
             $sommeBudget = 0;
             foreach ($TsectionSoeurs as $id) {
@@ -492,7 +492,7 @@ class TSectionPlanFormation extends TObjetStd
          * Retourne toutes les sections soeurs d'une section.
          * Ne renvoie pas la section qui a pour id, l'id passé en paramètre.
          */
-        public function getSectionsSoeurs(&$TSectionSoeurs) {
+        public function getSectionsSoeurs(&$TSectionSoeurs, $fkSection) {
             
             $PDOdb = new TPDOdb;
             $fkSectionParente = $this->fk_section_parente;
@@ -501,11 +501,12 @@ class TSectionPlanFormation extends TObjetStd
                     FROM '.MAIN_DB_PREFIX.'planform_planform_section
                     WHERE fk_section_parente='.$fkSectionParente
                     .' AND fk_planform='.$this->fk_planform;
+            var_dump($sql);
             $result = $PDOdb->Execute($sql);
             if ($result !== false) {
                 while ( $PDOdb->Get_line() ) {
                     $fkSectionSoeur = $PDOdb->Get_field('fk_section');
-                    if($fkSectionSoeur !== $this->fk_section)
+                    if($fkSectionSoeur !== $fkSection)
                         $TSectionSoeurs[] = $fkSectionSoeur;
                 }
             }
