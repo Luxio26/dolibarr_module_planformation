@@ -515,8 +515,10 @@ class TSectionPlanFormation extends TObjetStd
         public function getSectionsFilles(&$TSectionEnfantes, $fkPlanform, $fkSection) {
             
             $PDOdb = new TPDOdb;
-            $sql = 'SELECT fk_planform, fk_section, fk_section_parente , budget
-                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+            $sql = 'SELECT fk_planform, fk_section, fk_section_parente , budget, ref, nom
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section as pps
+                    INNER JOIN '.MAIN_DB_PREFIX.'planform_section as ps ON pps.fk_section=ps.rowid
+                    INNER JOIN '.MAIN_DB_PREFIX.'usergroup as ug ON ps.fk_usergroup=ug.rowid
                     WHERE fk_section_parente='.$fkSection
                     .' AND fk_planform='.$fkPlanform;
             
@@ -527,6 +529,8 @@ class TSectionPlanFormation extends TObjetStd
                     
                     $TSectionEnfantes[] = array('fk_planform' => $PDOdb->Get_field('fk_planform'),
                                                 'fk_section' => $fkSectionFille,
+                                                'ref' => $PDOdb->Get_field('ref'),
+                                                'groupe' => $PDOdb->Get_field('nom'),
                                                 'budget' => $PDOdb->Get_field('budget'),
                                                 'fk_section_parente' => $PDOdb->Get_field('fk_section_parente'));
                     $this->getSectionsFilles($TSectionEnfantes, $fkPlanform, $fkSectionFille);
@@ -540,8 +544,10 @@ class TSectionPlanFormation extends TObjetStd
          */
         public function getAllSection(&$PDOdb, &$TRes, $fkPlanform) {
             
-            $sql = 'SELECT fk_planform, fk_section, fk_section_parente, budget
-                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+            $sql = 'SELECT fk_planform, fk_section, fk_section_parente, budget, ref, nom
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section as pps
+                    INNER JOIN '.MAIN_DB_PREFIX.'planform_section as ps ON pps.fk_section=ps.rowid
+                    INNER JOIN '.MAIN_DB_PREFIX.'usergroup as ug ON ps.fk_usergroup=ug.rowid
                     WHERE fk_planform='.$fkPlanform
                     .' AND fk_section_parente=0';
             
@@ -553,7 +559,8 @@ class TSectionPlanFormation extends TObjetStd
                     $TRes[] = array(
                                 'fk_planform' => $PDOdb->Get_field('fk_planform'),
                                 'fk_section' => $fkSection,
-                                //'groupe' => $PDOdb->Get_field('')
+                                'ref' => $PDOdb->Get_field('ref'),
+                                'groupe' => $PDOdb->Get_field('nom'),
                                 'budget' => $PDOdb->Get_field('budget'),
                                 'fk_section_parente' => $PDOdb->Get_field('fk_section_parente'));
                     $this->getSectionsFilles($TRes, $fkPlanform, $fkSection);

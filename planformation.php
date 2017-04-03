@@ -400,10 +400,12 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
                                     (empty($section['fk_section_parente'])) ? '': 'fk_menu'=>$section['fk_section_parente'],
                                     'entry' => '<table class="nobordernopadding centpercent">
                                                 <tr>
-                                                    <td width="20%">'. "<a href='section.php?id=". $section['fk_section'] . "&plan_id=$pf->rowid'>" . $secName . "</a>" . '</td>
-                                                    <td width="50%" style="text-align: center;">'. $secParenteName .'</td>
-                                                    <td width="10%" style="text-align: center;">' . $section['budget'] . '</td>
-                                                    <td align="right" width="20px;">'
+                                                    <td width="120px">'. "<a href='section.php?id=". $section['fk_section'] . "&plan_id=$pf->rowid'>" . $section['ref'] . "</a>" . '</td>
+                                                    <td style="text-align: center;" width="160px">'. $secName .'</td>
+                                                    <td width="150px">'. $section['groupe'] .'</td>
+                                                    <td width="150px" style="text-align: center;">'. $secParenteName .'</td>
+                                                    <td width="100px" style="text-align: center;">' . $section['budget'] . '</td>
+                                                    <td align="right" width="20px">'
                                                         ."<a href='planformation.php?section_id=".$section['fk_section']."&plan_id=$pf->rowid&action=delete_link'>" . img_picto('', 'delete') . "</a>"
                                                     .'</td>
                                                 </tr>
@@ -416,7 +418,7 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
                 if ($nbofentries > 0)
                 {
                         print '<table class="nobordernopadding centpercent">';
-                        print '<tr><th width="21%">Titre</th><th width="50%">Parent</th><th width="10%">Budget</th><th align="right" width="20px;">Supprimer</th></tr>';
+                        print '<tr><th width="140px">Réf.</th><th width="160px">Titre</th><th width="160px">Groupe</th><th width="160px">Parent</th><th width="25px">Budget</th><th align="right" width="80px">Supprimer</th></tr>';
                         print '</table>';
                         print '<tr><td colspan="3">';
                         tree_recur($data,$data[0],0);
