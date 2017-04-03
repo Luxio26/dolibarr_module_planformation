@@ -514,7 +514,7 @@ class TSectionPlanFormation extends TObjetStd
         public function getSectionsFilles(&$TSectionEnfantes, $fkPlanform, $fkSection) {
             
             $PDOdb = new TPDOdb;
-            $sql = 'SELECT fk_planform, fk_section, fk_section_parente 
+            $sql = 'SELECT fk_planform, fk_section, fk_section_parente , budget
                     FROM '.MAIN_DB_PREFIX.'planform_planform_section
                     WHERE fk_section_parente='.$fkSection
                     .' AND fk_planform='.$fkPlanform;
@@ -523,8 +523,10 @@ class TSectionPlanFormation extends TObjetStd
             if ($result !== false) {
                 while ( $PDOdb->Get_line() ) {
                     $fkSectionFille=$PDOdb->Get_field('fk_section');
+                    
                     $TSectionEnfantes[] = array('fk_planform' => $PDOdb->Get_field('fk_planform'),
                                                 'fk_section' => $fkSectionFille,
+                                                'budget' => $PDOdb->Get_field('budget'),
                                                 'fk_section_parente' => $PDOdb->Get_field('fk_section_parente'));
                     $this->getSectionsFilles($TSectionEnfantes, $fkPlanform, $fkSectionFille);
                 }
@@ -546,9 +548,12 @@ class TSectionPlanFormation extends TObjetStd
             if ($result !== false) {
                 while ( $PDOdb->Get_line() ) {
                     $fkSection = $PDOdb->Get_field('fk_section');
+                    
                     $TRes[] = array(
                                 'fk_planform' => $PDOdb->Get_field('fk_planform'),
                                 'fk_section' => $fkSection,
+                                //'groupe' => $PDOdb->Get_field('')
+                                'budget' => $PDOdb->Get_field('budget'),
                                 'fk_section_parente' => $PDOdb->Get_field('fk_section_parente'));
                     $this->getSectionsFilles($TRes, $fkPlanform, $fkSection);
                 }
