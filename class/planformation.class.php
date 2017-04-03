@@ -501,11 +501,11 @@ class TSectionPlanFormation extends TObjetStd
                     FROM '.MAIN_DB_PREFIX.'planform_planform_section
                     WHERE fk_section_parente='.$fkSectionParente
                     .' AND fk_planform='.$this->fk_planform;
-            var_dump($sql);
+            
             $result = $PDOdb->Execute($sql);
             if ($result !== false) {
                 while ( $PDOdb->Get_line() ) {
-                    $fkSectionSoeur = $PDOdb->Get_field('fk_section');
+                    $fkSectionSoeur = (int) $PDOdb->Get_field('fk_section');
                     if($fkSectionSoeur !== $fkSection)
                         $TSectionSoeurs[] = $fkSectionSoeur;
                 }
