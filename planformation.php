@@ -305,7 +305,6 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 
 		$buttons = $btCancel . $btSave;
 	} else {
-                //var_dump($_REQUEST);
 		$data['titre'] = load_fiche_titre($langs->trans("PFPlanFormationCard"), '');
 		$data['type_fin_label'] = $typeFin->lines[$pf->fk_type_financement];
 		$data['date_start'] = dol_print_date($pf->date_start);
@@ -396,7 +395,7 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
                 foreach($tab as $section) {
                     $secName = TSectionPlanFormation::getSectionNameById($PDOdb, $section['fk_section']);
                     $secParenteName = TSectionPlanFormation::getSectionNameById($PDOdb, $section['fk_section_parente']);
-                    //var_dump($section);
+                    
                     $data[] = array('rowid' => $section['fk_section'],
                                     (empty($section['fk_section_parente'])) ? '': 'fk_menu'=>$section['fk_section_parente'],
                                     'entry' => '<table class="nobordernopadding centpercent">
