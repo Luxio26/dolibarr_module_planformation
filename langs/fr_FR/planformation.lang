@@ -46,6 +46,7 @@ PFSelectSectionToAdd=Ajouter une section au plan
 NotDeletable=Attention !<br> Vous ne pouvez pas supprimer une section liée à un plan de formation...
 ListOfPFSection=Section(s) du plan
 HierarchicView=Vue hiérarchique
+NoCategoryYet=Pas encore de catégories
 
 #
 # Champs

@@ -445,6 +445,7 @@ class TSectionPlanFormation extends TObjetStd
             }
             
             // Récupérer le budget du plan de formation ou de la section parente
+            var_dump($this->fk_section_parente);
             if(empty($pfsLink->fk_section_parente)) {
                 $pf = new TPlanFormation();
                 $pf->load($PDOdb, $this->fk_planform);

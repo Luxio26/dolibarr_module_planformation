@@ -400,7 +400,7 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
                                     (empty($section['fk_section_parente'])) ? '': 'fk_menu'=>$section['fk_section_parente'],
                                     'entry' => '<table class="nobordernopadding centpercent">
                                                 <tr>
-                                                    <td width="120px">'. "<a href='section.php?id=". $section['fk_section'] . "&plan_id=$pf->rowid'>" . $section['ref'] . "</a>" . '</td>
+                                                    <td width="120px">' . img_picto('', 'object_planformation@planformation') . " <a href='section.php?id=". $section['fk_section'] . "&plan_id=$pf->rowid'>" . $section['ref'] . "</a>" . '</td>
                                                     <td style="text-align: center;" width="160px">'. $secName .'</td>
                                                     <td width="150px">'. $section['groupe'] .'</td>
                                                     <td width="150px" style="text-align: center;">'. $secParenteName .'</td>
